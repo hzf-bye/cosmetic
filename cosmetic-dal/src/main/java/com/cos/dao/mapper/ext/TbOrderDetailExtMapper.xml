@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cos.dao.mapper.ext.TbOrderDetailExtMapper" >
+  <resultMap id="BaseResultMap" type="com.cos.common.pojo.vo.OrderDetailVO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="num" property="num" jdbcType="BIGINT" />
+    <result column="total_fee" property="totalFee" jdbcType="BIGINT" />
+    <result column="price" property="price" jdbcType="BIGINT" />
+    <result column="short_name" property="goodsName" jdbcType="VARCHAR" />
+    <result column="main_pic" property="mainPic" jdbcType="VARCHAR" />
+    <result column="weight" property="weight" jdbcType="BIGINT" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    tb_order_detail.goods_id, order_id, num, total_fee, tb_order_detail.price, short_name, main_pic, weight, tb_order_detail.color
+  </sql>
+
+  <select id="selectOrderDetailByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_order_detail
+    left join tb_goods on tb_order_detail.goods_id = tb_goods.goods_id
+    where order_id = #{orderId}
+  </select>
+
+  <select id="selectGoodsNameByOrderId" parameterType="java.lang.String" resultType="String">
+    select short_name
+    from tb_order_detail, tb_goods
+    where order_id = #{order_id}
+    and tb_order_detail.goods_id = tb_goods.goods_id
+  </select>
+
+</mapper>

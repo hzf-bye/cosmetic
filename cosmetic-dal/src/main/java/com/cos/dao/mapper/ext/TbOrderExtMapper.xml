@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cos.dao.mapper.ext.TbOrderExtMapper" >
+  <resultMap id="BaseResultMap" type="com.cos.common.pojo.vo.OrderVO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="payment" property="payment" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="gmt_creat" property="orderTime" jdbcType="TIMESTAMP" />
+    <result column="receive_name" property="receiveName" jdbcType="VARCHAR" />
+    <result column="receive_phone" property="receivePhone" jdbcType="VARCHAR" />
+    <result column="receive_address" property="receiveAddress" jdbcType="VARCHAR" />
+    <result column="buyyer_remark" property="remark" jdbcType="VARCHAR" />
+    <result column="name" property="meetingPlaceName" jdbcType="VARCHAR" />
+    <result column="meeting_place_id" property="meetingPlaceId" jdbcType="BIGINT" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    tb_order.id, order_id, payment, tb_order.status, tb_order.gmt_creat, receive_name,
+    receive_phone, receive_address, buyyer_remark, tb_meeting_place.name, meeting_place_id
+  </sql>
+
+
+  <select id="selectOrdersByConditions" parameterType="com.cos.common.pojo.form.OrderForm" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_order, tb_meeting_place
+    <where>
+      and tb_order.meeting_place_id = tb_meeting_place.id
+      <if test="_parameter != null">
+        <if test="orderId != null">
+          and order_id like concat('%',#{orderId},'%')
+        </if>
+        <if test="status != null">
+          and tb_order.status=#{status}
+        </if>
+        <if test="receivePhone != null and receivePhone != '' ">
+          and receive_phone like concat('%',#{receivePhone},'%')
+        </if>
+        <if test="meetingPlaceId != null">
+          and meeting_place_id=#{meetingPlaceId}
+        </if>
+        <if test="receiveAddress != null and receiveAddress != '' ">
+          and receive_address like concat('%',#{receiveAddress},'%')
+        </if>
+        <if test="startDateTime != null">
+          and tb_order.gmt_creat &gt;= #{startDateTime}
+        </if>
+        <if test="endDateTime != null">
+          and tb_order.gmt_creat &lt;= #{endDateTime}
+        </if>
+
+        <if test="receiveName != null and receiveName != '' ">
+          and receive_name like concat('%',#{receiveName},'%')
+        </if>
+      </if>
+    </where>
+    order by tb_order.gmt_creat desc
+  </select>
+</mapper>

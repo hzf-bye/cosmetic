@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cos.dao.mapper.ext.TbMeetingPlaceExtMapper" >
+
+  <select id="selectAllMeetingPlace" resultType="com.cos.common.pojo.vo.MeetingPlaceVO">
+    select tb_meeting_place.id, name, brand_name brandName, start_time startTime, end_time endTime, status
+    from tb_meeting_place
+    left join tb_brand on tb_meeting_place.brand_id = tb_brand.id
+  </select>
+
+  <select id="selectMeetingPlaceByConditions" resultType="com.cos.common.pojo.vo.MeetingPlaceVO"
+          parameterType="com.cos.common.pojo.form.MeetingPlaceForm">
+    select tb_meeting_place.id, name, brand_name brandName, start_time startTime, end_time endTime, status
+    from tb_meeting_place, tb_brand
+    <where>
+      and tb_meeting_place.brand_id = tb_brand.id
+      <if test="_parameter != null">
+        <if test="name != null and name != ''">
+          and tb_meeting_place.name like concat('%', #{name} ,'%')
+        </if>
+        <if test="status != null">
+          and tb_meeting_place.status=#{status}
+        </if>
+        <if test="startTime != null and endTime != null">
+          and ((end_time &gt;= #{startTime} and start_time &lt;= #{startTime})
+          or (start_time &lt;= #{endTime} and end_time &gt;= #{endTime})
+          or (start_time &gt;= #{startTime} and end_time &lt;= #{endTime})
+          )
+        </if>
+        <if test="brandId != null ">
+          and tb_meeting_place.brand_id = #{brandId}
+        </if>
+      </if>
+    </where>
+    order by tb_meeting_place.gmt_creat desc
+
+  </select>
+
+</mapper>

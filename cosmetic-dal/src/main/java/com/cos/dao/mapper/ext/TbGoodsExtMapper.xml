@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cos.dao.mapper.ext.TbGoodsExtMapper" >
+
+  <resultMap id="BaseResultMap" type="com.cos.common.pojo.vo.GoodsVO" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="VARCHAR" />
+    <result column="short_name" property="shortName" jdbcType="VARCHAR" />
+    <result column="shop_name" property="shopName" jdbcType="VARCHAR" />
+    <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+    <result column="price" property="price" jdbcType="BIGINT" />
+    <result column="inventory" property="inventory" jdbcType="BIGINT" />
+    <result column="main_pic" property="mainPic" jdbcType="VARCHAR" />
+    <result column="sell_point" property="sellPoint" jdbcType="VARCHAR" />
+    <result column="weight" property="weight" jdbcType="INTEGER" />
+    <result column="color" property="color" jdbcType="VARCHAR" />
+    <result column="supply_price" property="supplyPrice" jdbcType="BIGINT" />
+    <result column="detail_pic" property="detailPicJson" jdbcType="VARCHAR" />
+    <result column="head_pic" property="headPic" jdbcType="VARCHAR" />
+    <result column="brand_name" property="brandName" jdbcType="VARCHAR" />
+    <result column="is_deleted" property="isDeleted" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    tb_goods.goods_id, short_name, shop_name, brand_name, price, inventory, main_pic, sell_point, weight, color, supply_price
+    head_pic, detail_pic, tb_goods.is_deleted
+  </sql>
+
+  <select id="selectGoodsByBrandName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_goods
+    left join tb_brand on tb_goods.brand_id=tb_brand.id
+    left join tb_pic_resource on tb_goods.goods_id = tb_pic_resource.goods_id
+    where tb_brand.brand_name=#{brandName} and tb_brand_deleted=0
+  </select>
+
+  <select id="selectGoodsByName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_goods
+    left join tb_brand on tb_goods.brand_id=tb_brand.id
+    left join tb_pic_resource on tb_goods.goods_id = tb_pic_resource.goods_id
+    where shop_name like #{name} and tb_brand_deleted=0
+  </select>
+
+  <select id="selectAllGoods" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_goods
+    left join tb_brand on tb_goods.brand_id=tb_brand.id
+    left join tb_pic_resource on tb_goods.goods_id = tb_pic_resource.goods_id
+    where tb_goods.is_deleted=0
+  </select>
+
+  <select id="selectGoodsByConditions" parameterType="com.cos.common.pojo.form.GoodsForm" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_goods, tb_brand, tb_pic_resource
+    <where>
+      and tb_goods.goods_id = tb_pic_resource.goods_id
+      and tb_goods.brand_id=tb_brand.id
+      and tb_brand.is_deleted=0
+      <if test="_parameter != null">
+        <if test="goodsId != null and goodsId != ''">
+          and tb_goods.goods_id like concat('%', #{goodsId}, '%')
+        </if>
+        <if test="brandId != null">
+          and tb_goods.brand_id=#{brandId}
+        </if>
+        <if test="shopName != null and shopName != ''">
+          and shop_name like concat('%', #{shopName}, '%')
+        </if>
+        <if test="isDeleted != null">
+          and tb_goods.is_deleted=#{isDeleted}
+        </if>
+      </if>
+    </where>
+    order by tb_goods.gmt_modified desc
+
+  </select>
+
+
+</mapper>
